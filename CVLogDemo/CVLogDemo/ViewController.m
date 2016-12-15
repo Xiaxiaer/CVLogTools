@@ -16,7 +16,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [CVLog getInstance].reportLogLevel=CVLog_WARN;
     CVLogError(@"%@",@{@"test":@(0),@"date":@[@(1),@(2)]});
+    CVLogDebug(@"%@",@{@"test":@(0),@"date":@[@(1),@(2)]});
+    CVLogWarn(@"%@",@{@"test":@(0),@"date":@[@(1),@(2)]});
+
     // Do any additional setup after loading the view, typically from a nib.
 }
 

@@ -54,16 +54,5 @@
 {
      
 }
-+(void)log:(BOOL)asynchronous level:(NSString *)level flag:(BOOL)flag context:(NSInteger)context file:(const char *)file function:(const char *)function line:(NSUInteger)line tag:(id)tag format:(NSString *)format, ...
-{
-    NSLog(@"testtesteststes");
-}
-+(void)log:(const char *)file function:(const char *)function line:(NSUInteger)line format:(NSString *)format, ...
-{
-    va_list args;
-    va_start(args, format);
-    NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
-    NSLog(@"TESTSTSTTTSTSTSTTT");
-    va_end(args);
-}
+
 @end

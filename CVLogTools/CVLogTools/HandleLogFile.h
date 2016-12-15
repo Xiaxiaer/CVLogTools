@@ -35,16 +35,4 @@ typedef enum _LogLevel{
  @param logFilePath 日志文件路径
  */
 -(void)writeLogIntoFile:(NSString *)logFilePath;
-
-+ (void)log:(BOOL)asynchronous
-      level:(NSString*)level
-       flag:(BOOL)flag
-    context:(NSInteger)context
-       file:(const char *)file
-   function:(const char *)function
-       line:(NSUInteger)line
-        tag:(id)tag
-     format:(NSString *)format, ... NS_FORMAT_FUNCTION(9,10);
-+(void)log:(const char *)file function:(const char *)function line:(NSUInteger)line;
-+(void)log:(const char *)file function:(const char *)function line:(NSUInteger)line format:(NSString *)format, ... NS_FORMAT_FUNCTION(4, 5);
 @end
