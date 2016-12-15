@@ -10,12 +10,12 @@
 
 @implementation CVLog
 
-+(void)log:(const char *)file function:(const char *)function line:(NSUInteger)line format:(NSString *)format, ...
++(void)log:(CVLogLevel)level file:(const char *)file function:(const char *)function line:(NSUInteger)line format:(NSString *)format, ... NS_FORMAT_FUNCTION(5, 6)
 {
     va_list args;
     va_start(args, format);
     NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
-    NSLog(@"%@",message);
+    NSLog(@"\nlevel:%d\nfile:%s,\nfunc:%s,\nline:%d,\nmessage:%@",level,file,function,line,message);
     va_end(args);
 }
 @end

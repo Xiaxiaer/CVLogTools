@@ -16,7 +16,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    CVLog(
+    CVLogError(@"%@",@{@"test":@(0),@"date":@[@(1),@(2)]});
     // Do any additional setup after loading the view, typically from a nib.
 }
 

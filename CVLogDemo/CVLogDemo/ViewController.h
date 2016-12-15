@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CVLog.h"
 @interface ViewController : UIViewController
 
 
