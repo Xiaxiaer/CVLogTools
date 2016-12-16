@@ -17,9 +17,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [CVLog getInstance].reportLogLevel=CVLog_WARN;
-    CVLogError(@"%@",@{@"test":@(0),@"date":@[@(1),@(2)]});
-    CVLogDebug(@"%@",@{@"test":@(0),@"date":@[@(1),@(2)]});
-    CVLogWarn(@"%@",@{@"test":@(0),@"date":@[@(1),@(2)]});
+    CVLogDebug(@"%@",@{@"errorId":@(0),@"message":@"init failed"});
+    CVLogWarn(@"%@",@{@"errorId":@(0),@"message":@"init failed"});
+    CVLogError(@"%@",@{@"errorId":@(0),@"message":@"init failed"});
 
     // Do any additional setup after loading the view, typically from a nib.
 }
