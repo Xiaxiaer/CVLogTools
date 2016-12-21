@@ -102,45 +102,96 @@
 }
 -(void)upLoadWith:(NSString *)reportLogFilePath
 {
-//    NSString *urlStr = [NSString stringWithFormat: @"http://182.61.14.242/sdk-log/%@/%@/%@",_appkey,_formattedDate,filename];
-   NSString *urlStr = [self.reportServer stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+//    // 先从参入的路径的出URL
+//    NSURL *url = [NSURL fileURLWithPath:reportLogFilePath];
+//    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+//    
+//    // 只有响应头中才有其真实属性 也就是MIME
+//    NSURLResponse *response = nil;
+//    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+//    
+//    NSLog(@"%@", response.MIMEType);
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSString *urlStr = [self.reportServer stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL *url = [NSURL URLWithString:urlStr];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    request.HTTPMethod = @"PUT";
-    [request setValue:@"text/plain" forHTTPHeaderField:@"Content-Type"];
-    //POST
-    //            [request setValue:[NSString stringWithFormat:@"form-data;name=\"file\";filename=\"%@\"",filename] forHTTPHeaderField:@"Content-Disposition"];
-    //    [request addValue:@"text/plain" forHTTPHeaderField:@"Accept"];
-    [request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
-    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-    NSURLSession *session =  [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[[NSOperationQueue alloc] init]];
-    NSURL *fileUrl =   [NSURL fileURLWithPath:reportLogFilePath];
-    NSMutableData *postBody = [NSMutableData data];
-    [postBody appendData:[NSData dataWithContentsOfURL:fileUrl]];
-    [request setHTTPBody:postBody];
+    // 设置请求头数据 。  boundary：边界
+    [request setValue:@"multipart/form-data; boundary=----WebKitFormBoundaryftnnT7s3iF7wV5q6" forHTTPHeaderField:@"Content-Type"];
     
-    NSURLSessionUploadTask *uploadtask =   [session uploadTaskWithRequest:request fromFile:fileUrl completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        if (!error) {
-            NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-            //上传成功 删除
-            if ([[NSFileManager defaultManager] removeItemAtPath:reportLogFilePath error:nil]) {
-                NSLog(@"删除成功");
-            }
-            else
-            {
-                NSLog(@"没有");
-            }
-        }
-        
-        else
-        {
-            NSLog(@"%@",error.localizedFailureReason);
-        }
+    // 给请求头加入固定格式数据
+    NSMutableData *data = [NSMutableData data];
+    /****************文件参数相关设置*********************/
+    // 设置边界 注：必须和请求头数据设置的边界 一样， 前面多两个“-”；（字符串 转 data 数据）
+    [data appendData:[@"------WebKitFormBoundaryftnnT7s3iF7wV5q6" dataUsingEncoding:NSUTF8StringEncoding]];
+    [data appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    // 设置传入数据的基本属性， 包括有 传入方式 data ，传入的类型（名称） ，传入的文件名， 。
+    [data appendData:[@"Content-Disposition: form-data; name=\"file\"; filename=\"test.log\"" dataUsingEncoding:NSUTF8StringEncoding]];
+    [data appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    // 设置 内容的类型  “文件类型/扩展名” MIME中的
+    [data appendData:[@"Content-Type: text/plain" dataUsingEncoding:NSUTF8StringEncoding]];
+    [data appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    // 加入数据内容
+    NSURL *fileUrl =   [NSURL fileURLWithPath:reportLogFilePath];
+    NSData *contentData =[NSData dataWithContentsOfURL:fileUrl];
+    [data appendData:contentData];
+    [data appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    [data appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    // 设置边界
+    [data appendData:[@"------WebKitFormBoundaryftnnT7s3iF7wV5q6" dataUsingEncoding:NSUTF8StringEncoding]];
+    [data appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    request.HTTPBody = data;
+    request.HTTPMethod = @"POST";
+    NSURLSessionUploadTask *task = [session uploadTaskWithRequest:request fromData:data completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSLog(@"%@",[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]);
     }];
-    [[session uploadTaskWithRequest:request fromFile:fileUrl] resume];
-    [uploadtask resume];
-
+    [task resume];
+    NSLog(@"+++++++++++++");
 }
+
+//-(void)upLoadWith:(NSString *)reportLogFilePath
+//{
+////    NSString *urlStr = [NSString stringWithFormat: @"http://182.61.14.242/sdk-log/%@/%@/%@",_appkey,_formattedDate,filename];
+//   NSString *urlStr = [self.reportServer stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+//    NSURL *url = [NSURL URLWithString:urlStr];
+//    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+//    request.HTTPMethod = @"POST";
+////    [request setValue:@"text/plain" forHTTPHeaderField:@"Content-Type"];
+//    
+//    //POST
+//    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+//
+//    [request setValue:[NSString stringWithFormat:@"form-data;name=\"file\";filename=\"%@\"",@"test"] forHTTPHeaderField:@"Content-Disposition"];
+//    [request addValue:@"text/plain" forHTTPHeaderField:@"Accept"];
+//    [request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
+//    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+//    NSURLSession *session =  [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[[NSOperationQueue alloc] init]];
+//    NSURL *fileUrl =   [NSURL fileURLWithPath:reportLogFilePath];
+//    NSMutableData *postBody = [NSMutableData data];
+//    [postBody appendData:[NSData dataWithContentsOfURL:fileUrl]];
+//    [request setHTTPBody:postBody];
+//    
+//    NSURLSessionUploadTask *uploadtask =   [session uploadTaskWithRequest:request fromFile:fileUrl completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+//        if (!error) {
+//            NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+//            //上传成功 删除
+//            if ([[NSFileManager defaultManager] removeItemAtPath:reportLogFilePath error:nil]) {
+//                NSLog(@"删除成功");
+//            }
+//            else
+//            {
+//                NSLog(@"没有");
+//            }
+//        }
+//        
+//        else
+//        {
+//            NSLog(@"%@",error.localizedFailureReason);
+//        }
+//    }];
+//    [uploadtask resume];
+//
+//}
 -(void)writeLogtoFile:(NSString *)content file:(NSString *)filepath
 {
     NSFileHandle *outFile = [NSFileHandle fileHandleForWritingAtPath:filepath];

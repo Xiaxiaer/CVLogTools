@@ -17,6 +17,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [CVLog getInstance].reportLogLevel=CVLog_WARN;
+    [CVLog getInstance].reportServer = @"http://127.0.0.1:8000/upload";
     CVLogDebug(@"%@",@{@"errorId":@(0),@"message":@"init failed"});
     CVLogWarn(@"%@",@{@"errorId":@(0),@"message":@"init failed"});
     CVLogError(@"%@",@{@"errorId":@(0),@"message":@"init failed"});
